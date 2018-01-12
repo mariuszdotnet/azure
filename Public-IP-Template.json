@@ -15,13 +15,6 @@
         "metadata": {
           "description": "Public IP Address Name"
         }
-      },
-      "publicIPdnsPrefix": {
-        "type": "string",
-        "defaultValue": "publicdnsprefix",
-        "metadata": {
-          "description": "Public IP DNS Prefix"
-        }
       }
     },
     "variables": {
