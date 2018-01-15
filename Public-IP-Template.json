@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.4",
+    "contentVersion": "1.0.0.5",
     "parameters": {
         "publicIPsku": {
             "type": "string",
@@ -8,7 +8,10 @@
                 "Basic",
                 "Standard"
             ],
-            "defaultValue": "Basic"
+            "defaultValue": "Basic",
+            "metadata": {
+                "description": "Select Public IP SKU"
+            }
         },
         "publicIPAddressName": {
             "type": "string",
