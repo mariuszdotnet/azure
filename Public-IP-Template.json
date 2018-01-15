@@ -30,7 +30,9 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "name": "[parameters('publicIPAddressName')]",
             "location": "[resourceGroup().location]",
-            "sku": "[parameters('publicIPsku')]",
+            "sku": {
+                "name": "[parameters('publicIPsku')]"
+            },
             "properties": {
                 "publicIPAllocationMethod": "[variables('defaultAllocationMethod')]"
             }
