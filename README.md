@@ -12,5 +12,9 @@
     Deploy Public-IP-Template.json
 </a>
 
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fjozef-hasaralejko%2Fazure%2Fmaster%2FCreate-VM.json" target="_blank">
+    Deploy Create-VM.json.json
+</a>
+
 
 
