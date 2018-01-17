@@ -1,0 +1,49 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vmName": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify VM name"
+            }
+        },
+        "attachDomain": {
+            "type": "string",
+            "allowedValues": [
+                "mfcgd.com",
+                "standalone"
+            ],
+            "metadata": {
+                "description": "Should VM be attached to domain"
+            }
+        },
+        "adminPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "Password for azadmin"
+            }
+        },
+        "vmSize": {
+            "type": "string",
+            "allowedValues": [
+                "vCPU:2 MemGB:8  TempStorage:16",
+                "vCPU:4 MemGB:16 TempStorage:32",
+                "vCPU:8 MemGB:32 TempStorage:64"
+            ],
+            "metadata": {
+                "description": "Select VM size"
+            }
+        }
+    },
+    "variables": {
+        "defaultAdmin": "azadmin",
+        "vmSizeKey": {
+            "vCPU:2 MemGB:8  TempStorage:16": "Standard_D2s_v3",
+            "vCPU:4 MemGB:16 TempStorage:32": "Standard_D4s_v3",
+            "vCPU:8 MemGB:32 TempStorage:64": "Standard_D8s_v3"
+        }
+    },
+    "resources": [],
+    "outputs": {}
+}
