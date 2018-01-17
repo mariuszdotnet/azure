@@ -43,6 +43,12 @@
                 "description": "Select VM size"
             }
         },
+        "avSet": {
+            "type": "string",
+            "metadata": {
+                "description": "Provide availability set name"
+            }
+        },
         "recVault": {
             "type": "bool",
             "metadata": {
@@ -68,7 +74,7 @@
         "subnet": {
             "type": "string",
             "metadata": {
-                "description": "select subnet"
+                "description": "Select subnet"
             }
         },
         "publicIP": {
