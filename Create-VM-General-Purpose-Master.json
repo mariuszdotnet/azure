@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.15",
+    "contentVersion": "1.0.1.16",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -109,7 +109,8 @@
         "publicIPAddressName": "[concat('PIP-', parameters('vmName'), '-', parameters('publicIP'))]",
         "vNICName": "[concat('NIC-', parameters('vmName'), '-1')]",
         "vNetID": "[resourceId( concat('VNET_',parameters('virtualNetwork')), 'Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
-        "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]"
+        "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
+        "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses', 'publicIPAddressName')]"
     },
     "resources": [
         {
@@ -146,7 +147,7 @@
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[variables('subnetID')]",
-                                "publicIP": "[json('null')]"
+                                "publicIP": "[if(not(equals(parameters('publicIP'), 'none')) , variables('publicIPAddressID'), json('null'))]"
                             }
 
                         }
