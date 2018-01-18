@@ -115,5 +115,10 @@
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "hello": {
+            "type": "string",
+            "value": "variables('hello')"
+        }
+    }
 }
