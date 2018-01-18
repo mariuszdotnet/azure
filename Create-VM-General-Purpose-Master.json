@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.7",
+    "contentVersion": "1.0.1.8",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -58,12 +58,14 @@
         },
         "virtualNetwork": {
             "type": "string",
+            "defaultValue": "MFCv2-GlobalControlZone-USE2-S1",
             "metadata": {
                 "description": "Select vNet"
             }
         },
         "subnet": {
             "type": "string",
+            "defaultValue": "Internal-1",
             "metadata": {
                 "description": "select subnet"
             }
@@ -125,7 +127,7 @@
             }
         },
         {
-            "name": "[variables(vNICName)]",
+            "name": "[variables('vNICName')]",
             "apiVersion": "2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
             "location": "[resourceGroup().location]",
