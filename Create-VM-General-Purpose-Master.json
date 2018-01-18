@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.5",
+    "contentVersion": "1.0.1.6",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -96,7 +96,11 @@
         "storageTypeKey": {
             "Standard": "Standard_LRS",
             "Premium": "Premium_LRS"
-        }
+        },
+        "publicIPAddressName": "[concat('PIP-', parameters('vmName'), '-', parameters('publicIP'))]",
+        "vNICName": "[concat('NIC-', parameters('vmName'), '-1')]",
+        "vNetID": "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetwork')]",
+        "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('subnet')]"
     },
     "resources": [
         {
@@ -115,10 +119,34 @@
                         "value": "[parameters('publicIP')]"
                     },
                     "publicIPAddressName": {
-                        "value": "[concat('PIP-', parameters('vmName'), '-', parameters('publicIP'))]"
+                        "value": "[variables('publicIPAddressName')]"
                     }
-
                 }
+            }
+        },
+        {
+            "name": "[variables(vNICName)]",
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[if(not(equals(parameters('publicIP'), 'none'))), resourceId('Microsoft.Network/publicIPAddresses', 'publicIPAddressName'),json('null')]",
+                "[variables('vNetID')]",
+                "[variables('subnetID')]"
+            ],
+            "properties": {
+                "ipConfigurations":[
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Dynamic",
+                            "subnet": {
+                                "id": "[variables('subnetID')]"
+                            }
+
+                        }
+                    }
+                ]
             }
         }
     ],
