@@ -1,14 +1,7 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.5",
+    "contentVersion": "1.0.0.6",
     "parameters": {
-        "version": {
-            "type": "string",
-            "defaultValue": "1.0.0.5",
-            "allowedValues": [
-                "1.0.0.5"
-            ]
-        },
         "vmName": {
             "type": "string",
             "metadata": {
@@ -50,11 +43,15 @@
             }
         },
         "recoveryVault": {
-            "type": "bool",
+            "type": "string",
+            "allowedValues": [
+                "Backup required",
+                "Backup not required"
+            ],
             "metadata": {
                 "description": "Is backup required?"
             }
-        },
+        }
         "storageType": {
             "type": "string",
             "allowedValues": [
