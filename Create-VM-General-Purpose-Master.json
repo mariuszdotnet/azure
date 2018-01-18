@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.11",
+    "contentVersion": "1.0.1.12",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -139,7 +139,6 @@
             "type": "Microsoft.Network/networkInterfaces",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[if(not(equals(parameters('publicIP'), 'none')), resourceId('Microsoft.Network/publicIPAddresses', 'publicIPAddressName'), json('null'))]",
                 "[variables('vNetID')]",
                 "[variables('subnetID')]"
             ],
