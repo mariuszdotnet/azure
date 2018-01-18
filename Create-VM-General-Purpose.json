@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.0",
+    "contentVersion": "1.0.1.1",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -100,7 +100,7 @@
     },
     "resources": [
         {
-            "condition": "[not(equals(parameters('publicIP'), 'none')]",
+            "condition": "[not(equals(parameters('publicIP'), 'none'))]",
             "name": "Create-PublicIP",
             "apiVersion": "2017-05-10",
             "type": "Microsoft.Resources/deployments",
