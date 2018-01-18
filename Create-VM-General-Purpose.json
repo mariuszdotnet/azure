@@ -107,7 +107,7 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[uri(deployment().properties.templateLink.uri, 'Compute/vmPurpose-general-purpose.json')]",
-                    "contentVersion": "1.0.0.4"
+                    "contentVersion": "1.0.0.5"
                 },
                 "parameters": {
                     "vmName": {
