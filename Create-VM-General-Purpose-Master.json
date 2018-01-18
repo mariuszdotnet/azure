@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.17",
+    "contentVersion": "1.0.1.18",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -145,11 +145,12 @@
                         "name": "ipconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
+                            "publicIPAddress": {
+                                "id": "[if(equals(parameters('publicIP'), 'none') , json('null'), variables('publicIPAddressID'))]"
+                            },
                             "subnet": {
-                                "id": "[variables('subnetID')]",
-                                "publicIP": "[if(equals(parameters('publicIP'), 'none') , json('null'), variables('publicIPAddressID'))]"
+                                "id": "[variables('subnetID')]"
                             }
-
                         }
                     }
                 ]
