@@ -43,7 +43,7 @@
                 "description": "Select VM size"
             }
         },
-        "recVault": {
+        "recoveryVault": {
             "type": "bool",
             "metadata": {
                 "description": "Is backup required?"
@@ -59,7 +59,7 @@
                 "description": "Select storage type"
             }
         },
-        "vNet": {
+        "virtualNetwork": {
             "type": "string",
             "metadata": {
                 "description": "Select vNet"
@@ -110,15 +110,15 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[uri(deployment().properties.templateLink.uri, 'Compute/vmPurpose-general-purpose.json')]",
-                    "contentVersion": "1.0.0.1"
+                    "contentVersion": "1.0.0.2"
                 }
             }
         }
     ],
     "outputs": {
-        "hello": {
+        "XXX": {
             "type": "string",
-            "value": "variables('hello')"
+            "value": "[reference('linkedTemplate').outputs.greetingMessage.value]"
         }
     }
 }
