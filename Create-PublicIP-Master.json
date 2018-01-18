@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.11",
+    "contentVersion": "1.0.1.0",
     "parameters": {
         "publicIPSku": {
             "type": "string",
@@ -25,16 +25,24 @@
     },
     "resources": [
         {
-            "comments": "Public IP Address Resource",
-            "apiVersion": "2017-10-01",
-            "type": "Microsoft.Network/publicIPAddresses",
-            "name": "[parameters('publicIPAddressName')]",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "[parameters('publicIPSku')]"
-            },
+            "name": "Create-PublicIP",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
             "properties": {
-                "publicIPAllocationMethod": "[variables('defaultAllocationMethod')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'Network/Create-PublicIP-Template.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "publicIPSku": {
+                        "value": "[parameters('publicIP')]"
+                    },
+                    "publicIPAddressName": {
+                        "value": "[concat('PIP-', parameters('vmName'), '-', parameters('publicIP'))]"
+                    }
+
+                }
             }
         }
     ],
