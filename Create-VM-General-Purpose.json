@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.10",
+    "contentVersion": "1.0.1.0",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -100,27 +100,27 @@
     },
     "resources": [
         {
-            "name": "linkedTemplate",
+            "condition": "[not(equals(parameters('publicIP'), 'none')]",
+            "name": "Create-PublicIP",
             "apiVersion": "2017-05-10",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
-                    "uri": "[uri(deployment().properties.templateLink.uri, 'Compute/vmPurpose-general-purpose.json')]",
-                    "contentVersion": "1.0.0.5"
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'Network/Create-PublicIP.json')]",
+                    "contentVersion": "1.0.0.0"
                 },
                 "parameters": {
-                    "vmName": {
-                        "value": "[parameters('vmName')]"
+                    "publicIPSku": {
+                        "value": "paramaters('publicIP)"
+                    },
+                    "publicIPAddressName": {
+                        "value": "[concat('PIP-',parameters('vmName'),'-',parameters('publicIP')]"
                     }
+
                 }
             }
         }
     ],
-    "outputs": {
-        "XXX": {
-            "type": "string",
-            "value": "[reference('linkedTemplate').outputs.greetingMessage.value]"
-        }
-    }
+    "outputs": { }
 }
