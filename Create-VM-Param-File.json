@@ -1,0 +1,36 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+       "vmName": {
+           "value": "vmname"
+       },
+       "attachDomain" : {
+           "value": "standalone"
+       },
+       "adminPassword": {
+           "value": "111"
+       },
+       "vmSize": {
+           "value": "vCPU:2 MemGB:8  TempStorage:16"
+       },
+       "recoveryVault": {
+           "value": "Backup required"
+       },
+       "storageType": {
+           "value": "Standard"
+       },
+       "virtualNetwork": {
+           "value": "111"
+       },
+       "subnet": {
+           "value": "111"
+       },
+       "publicIP": {
+           "value": "none"
+       },
+       "costCenter": {
+           "value": "111"
+       }
+    }
+  }
