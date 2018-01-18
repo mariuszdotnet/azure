@@ -135,7 +135,6 @@
             }
         },
         {
-            "condition": "[not(equals(parameters('publicIP'), 'none'))]",
             "name": "[variables('vNICName')]",
             "apiVersion": "2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
@@ -147,28 +146,8 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "publicIPAddress": {
-                                "id": "[variables('publicIPAddressID')]"
+                                "id": "[if(equals(parameters('publicIP'), 'none') , json(''), variables('publicIPAddressID'))]"
                             },
-                            "subnet": {
-                                "id": "[variables('subnetID')]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "condition": "[equals(parameters('publicIP'), 'none')]",
-            "name": "[variables('vNICName')]",
-            "apiVersion": "2017-06-01",
-            "type": "Microsoft.Network/networkInterfaces",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "ipConfigurations":[
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
                                 "id": "[variables('subnetID')]"
                             }
