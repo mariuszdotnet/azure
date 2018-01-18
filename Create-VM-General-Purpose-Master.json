@@ -1,9 +1,10 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.8",
+    "contentVersion": "1.0.1.10",
     "parameters": {
         "vmName": {
             "type": "string",
+            "defaultValue": "AZWAPPT1",
             "metadata": {
                 "description": "Specify VM name"
             }
@@ -21,12 +22,14 @@
         },
         "adminPassword": {
             "type": "securestring",
+            "defaultValue": "Asdqwe135$",
             "metadata": {
                 "description": "Password for azadmin"
             }
         },
         "vmSize": {
             "type": "string",
+            "defaultValue": "vCPU:2 MemGB:8  TempStorage:16",
             "allowedValues": [
                 "vCPU:2 MemGB:8  TempStorage:16",
                 "vCPU:4 MemGB:16 TempStorage:32",
@@ -38,6 +41,7 @@
         },
         "recoveryVault": {
             "type": "string",
+            "defaultValue": "Backup required",
             "allowedValues": [
                 "Backup required",
                 "Backup not required"
@@ -48,6 +52,7 @@
         },
         "storageType": {
             "type": "string",
+            "defaultValue": "Standard",
             "allowedValues": [
                 "Standard",
                 "Premium"
@@ -72,6 +77,7 @@
         },
         "publicIP": {
             "type": "string",
+            "defaultValue": "none",
             "allowedValues": [
                 "none",
                 "Basic",
@@ -83,6 +89,7 @@
         },
         "costCenter": {
             "type": "string",
+            "defaultValue": "1234",
             "metadata": {
                 "description": "Provide cost center"
             }
@@ -132,7 +139,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[if(not(equals(parameters('publicIP'), 'none'))), resourceId('Microsoft.Network/publicIPAddresses', 'publicIPAddressName'),json('null')]",
+                "[if(not(equals(parameters('publicIP'), 'none'))), resourceId('Microsoft.Network/publicIPAddresses', 'publicIPAddressName'), json('null')]",
                 "[variables('vNetID')]",
                 "[variables('subnetID')]"
             ],
