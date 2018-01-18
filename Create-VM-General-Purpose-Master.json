@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.13",
+    "contentVersion": "1.0.1.14",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -108,7 +108,7 @@
         },
         "publicIPAddressName": "[concat('PIP-', parameters('vmName'), '-', parameters('publicIP'))]",
         "vNICName": "[concat('NIC-', parameters('vmName'), '-1')]",
-        "vNetID": "[resourceId('Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
+        "vNetID": "[resourceId( concat('VNET_',parameters('virtualNetwork')), 'Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
         "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]"
     },
     "resources": [
