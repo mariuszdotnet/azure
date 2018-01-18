@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.1",
+    "contentVersion": "1.0.1.2",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -115,7 +115,7 @@
                         "value": "paramaters('publicIP)"
                     },
                     "publicIPAddressName": {
-                        "value": "[concat('PIP-',parameters('vmName'),'-',parameters('publicIP')]"
+                        "value": "[concat('PIP-', parameters('vmName'), '-', parameters('publicIP'))]"
                     }
 
                 }
