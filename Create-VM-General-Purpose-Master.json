@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.0",
+    "contentVersion": "1.0.2.1",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -22,14 +22,14 @@
         },
         "adminPassword": {
             "type": "securestring",
-            "defaultValue": "Asdqwe135$",
+            "defaultValue": "ZXCasdqwe123$%",
             "metadata": {
                 "description": "Password for azadmin"
             }
         },
         "vmSize": {
             "type": "string",
-            "defaultValue": "vCPU:2 MemGB:8  TempStorage:16",
+            "defaultValue": "Small",
             "allowedValues": [
                 "Small",
                 "Medium",
@@ -143,6 +143,9 @@
             "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
             "location": "[resourceGroup().location]",
+            "tags": {
+                "CostCenter": "[parameters('costCenter')]"
+            },
             "dependsOn": [
                 "[resourceId(Microsoft.Network/networkInterfaces/', variables('vNICName'))]",
                 "[resourceId(Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]"
