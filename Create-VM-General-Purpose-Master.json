@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.2",
+    "contentVersion": "1.0.2.3",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -103,8 +103,8 @@
         "imageSKU": "2016-Datacenter",
         "imageVersion": "latest",
         "defaultOSDiskSize": "128",
-        "diagAccountName": "[concat('gp7',vmdiag',resourceGroup().location,'001')]",
-        "diagAccountUri": ""
+        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
+        "diagAccountUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('diagAccountName')), '2017-10-01').primaryEndpoints.blob)]"
     },
     "resources": [
         {
