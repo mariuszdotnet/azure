@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.4",
+    "contentVersion": "1.0.2.7",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -96,14 +96,15 @@
         },
         "vNICName": "[concat('NIC-', parameters('vmName'), '-1')]",
         "vNICNameId": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNICName'))]",
-        "vNetID": "[resourceId(concat('VNET_',parameters('virtualNetwork')), 'Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
-        "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
+        "vNetId": "[resourceId(concat('VNET_',parameters('virtualNetwork')), 'Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
+        "subnetId": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
         "imagePublisher": "MicrosoftWindowsServer",
         "imageOffer": "WindowsServer",
         "imageSKU": "2016-Datacenter",
         "imageVersion": "latest",
         "defaultOSDiskSize": "128",
-        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]"
+        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
+        "diagAccountNameId": "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]"
     },
     "resources": [
         {
@@ -133,10 +134,13 @@
             "sku": {
                 "name": "Standard_LRS"
             },
-            "kind": "BlobStorage"
+            "kind": "StorageV2",
+            "properties": {
+                "accessTier": "Hot"
+            }
         },
         {
-            "name": "[variables('vmName')]",
+            "name": "[parameters('vmName')]",
             "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
             "location": "[resourceGroup().location]",
@@ -144,12 +148,12 @@
                 "CostCenter": "[parameters('costCenter')]"
             },
             "dependsOn": [
-                "[resourceId(Microsoft.Network/networkInterfaces/', variables('vNICName'))]",
-                "[resourceId(Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]"
+                "[variables('vNICNameId')]",
+                "[variables('diagAccountNameId')]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('vmSizeKey')[parameters('vmSize')]"
+                    "vmSize": "[variables('vmSizeKey')[parameters('vmSize')]]"
                 },
                 "osProfile": {
                     "computerName": "[parameters('vmName')]",
@@ -164,12 +168,12 @@
                         "version": "[variables('imageVersion')]"
                     },
                     "osDisk": {
-                        "name": "[concat('DISK-', parameters('vmName'), '-OS']",
+                        "name": "[concat('DISK-', parameters('vmName'), '-OS')]",
                         "createOption": "FromImage",
                         "diskSizeGB": "[variables('defaultOSDiskSize')]",
                         "caching": "ReadWrite",
                         "managedDisk": {
-                            "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]"
+                            "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
                         }
                     }
                 },
