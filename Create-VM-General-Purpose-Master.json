@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.7",
+    "contentVersion": "1.0.2.9",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -41,7 +41,7 @@
         },
         "recoveryVault": {
             "type": "string",
-            "defaultValue": "Backup required",
+            "defaultValue": "Backup not required",
             "allowedValues": [
                 "Backup required",
                 "Backup not required"
@@ -97,14 +97,17 @@
         "vNICName": "[concat('NIC-', parameters('vmName'), '-1')]",
         "vNICNameId": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNICName'))]",
         "vNetId": "[resourceId(concat('VNET_',parameters('virtualNetwork')), 'Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
-        "subnetId": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
+        "subnetId": "[concat(variables('vnetId'),'/subnets/', parameters('subnet'))]",
         "imagePublisher": "MicrosoftWindowsServer",
         "imageOffer": "WindowsServer",
         "imageSKU": "2016-Datacenter",
         "imageVersion": "latest",
         "defaultOSDiskSize": "128",
         "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
-        "diagAccountNameId": "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]"
+        "diagAccountNameId": "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
+        "recoveryVaultName": "[concat('VAULT-',toUpper(resourceGroup().location),'-1')]",
+        "recoveryVaultNameId": "[resourceId('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'))]",
+        "recoveryVaultPolicyName": "[concat(variables('recoveryVaultNameId'), '/DefaultPolicy')]"
     },
     "resources": [
         {
@@ -119,7 +122,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Dynamic",
                             "subnet": {
-                                "id": "[variables('subnetID')]"
+                                "id": "[variables('subnetId')]"
                             }
                         }
                     }
@@ -140,16 +143,28 @@
             }
         },
         {
+            "name": "[variables('recoveryVaultName')]",
+            "type": "Microsoft.RecoveryServices/vaults",
+            "apiVersion": "2016-06-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "RS0",
+                "tier": "Standard"
+            },
+            "properties": { }
+        },
+        {
             "name": "[parameters('vmName')]",
-            "apiVersion": "2017-03-30",
             "type": "Microsoft.Compute/virtualMachines",
+            "apiVersion": "2017-03-30",
             "location": "[resourceGroup().location]",
             "tags": {
                 "CostCenter": "[parameters('costCenter')]"
             },
             "dependsOn": [
                 "[variables('vNICNameId')]",
-                "[variables('diagAccountNameId')]"
+                "[variables('diagAccountNameId')]",
+                "[if(equals(parameters('recoveryVault'),'Backup required'),variables('recoveryVaultNameId'),'[]')]"
             ],
             "properties": {
                 "hardwareProfile": {
