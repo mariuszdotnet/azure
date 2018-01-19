@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.1.23",
+    "contentVersion": "1.0.2.0",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -31,9 +31,9 @@
             "type": "string",
             "defaultValue": "vCPU:2 MemGB:8  TempStorage:16",
             "allowedValues": [
-                "vCPU:2 MemGB:8  TempStorage:16",
-                "vCPU:4 MemGB:16 TempStorage:32",
-                "vCPU:8 MemGB:32 TempStorage:64"
+                "Small",
+                "Medium",
+                "Medium Plus"
             ],
             "metadata": {
                 "description": "Select VM size"
@@ -75,18 +75,6 @@
                 "description": "select subnet"
             }
         },
-        "publicIP": {
-            "type": "string",
-            "defaultValue": "none",
-            "allowedValues": [
-                "none",
-                "Basic",
-                "Standard"
-            ],
-            "metadata": {
-                "description": "Is public IP required?"
-            }
-        },
         "costCenter": {
             "type": "string",
             "defaultValue": "1234",
@@ -98,9 +86,9 @@
     "variables": {
         "defaultAdmin": "azadmin",
         "vmSizeKey": {
-            "vCPU:2 MemGB:8  TempStorage:16": "Standard_D2s_v3",
-            "vCPU:4 MemGB:16 TempStorage:32": "Standard_D4s_v3",
-            "vCPU:8 MemGB:32 TempStorage:64": "Standard_D8s_v3"
+            "Small": "Standard_D2s_v3",
+            "Medium": "Standard_D4s_v3",
+            "Medium Plus": "Standard_D8s_v3"
         },
         "storageTypeKey": {
             "Standard": "Standard_LRS",
@@ -108,58 +96,20 @@
         },
         "publicIPAddressName": "[concat('PIP-', parameters('vmName'), '-', parameters('publicIP'))]",
         "vNICName": "[concat('NIC-', parameters('vmName'), '-1')]",
-        "vNICNamePublic": "[concat('NIC-', parameters('vmName'), '-Public-1')]",
-        "vNetID": "[resourceId( concat('VNET_',parameters('virtualNetwork')), 'Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
+        "vNICNameId": "[resourceId('Microsoft.Network/networkInterfaces',variables('vNICName'))]",
+        "vNetID": "[resourceId(concat('VNET_',parameters('virtualNetwork')), 'Microsoft.Network/virtualNetworks/', parameters('virtualNetwork'))]",
         "subnetID": "[concat(variables('vnetID'),'/subnets/', parameters('subnet'))]",
-        "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]"
+        "publicIPAddressID": "[resourceId('Microsoft.Network/publicIPAddresses', variables('publicIPAddressName'))]",
+        "imagePublisher": "MicrosoftWindowsServer",
+        "imageOffer": "WindowsServer",
+        "imageSKU": "2016-Datacenter",
+        "imageVersion": "latest",
+        "defaultOSDiskSize": "128",
+        "diagAccountName": "[concat('gp7',vmdiag',resourceGroup().location,'001')]",
+        "diagAccountUri": ""
     },
     "resources": [
         {
-            "condition": "[not(equals(parameters('publicIP'), 'none'))]",
-            "name": "Create-PublicIP",
-            "apiVersion": "2017-05-10",
-            "type": "Microsoft.Resources/deployments",
-            "properties": {
-                "mode": "Incremental",
-                "templateLink": {
-                    "uri": "[uri(deployment().properties.templateLink.uri, 'Network/Create-PublicIP-Template.json')]",
-                    "contentVersion": "1.0.0.0"
-                },
-                "parameters": {
-                    "publicIPSku": {
-                        "value": "[parameters('publicIP')]"
-                    },
-                    "publicIPAddressName": {
-                        "value": "[variables('publicIPAddressName')]"
-                    }
-                }
-            }
-        },
-        {
-            "condition": "[not(equals(parameters('publicIP'), 'none'))]",
-            "name": "[variables('vNICNamePublic')]",
-            "apiVersion": "2017-06-01",
-            "type": "Microsoft.Network/networkInterfaces",
-            "location": "[resourceGroup().location]",
-            "properties": {
-                "ipConfigurations":[
-                    {
-                        "name": "ipconfig1",
-                        "properties": {
-                            "privateIPAllocationMethod": "Dynamic",
-                            "publicIPAddress": {
-                                "id": "[variables('publicIPAddressID')]"
-                            },
-                            "subnet": {
-                                "id": "[variables('subnetID')]"
-                            }
-                        }
-                    }
-                ]
-            }
-        },
-        {
-            "condition": "[equals(parameters('publicIP'), 'none')]",
             "name": "[variables('vNICName')]",
             "apiVersion": "2017-06-01",
             "type": "Microsoft.Network/networkInterfaces",
@@ -176,6 +126,66 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            "name": "[variables('diagAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2017-10-01",
+            "location": "[resourceGroup().location]",
+            "sku": {
+                "name": "Standard_LRS"
+            },
+            "kind": "BlobStorage"
+        },
+        {
+            "name": "[variables('vmName')]",
+            "apiVersion": "2017-03-30",
+            "type": "Microsoft.Compute/virtualMachines",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId(Microsoft.Network/networkInterfaces/', variables('vNICName'))]",
+                "[resourceId(Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]"
+            ],
+            "properties": {
+                "hardwareProfile": {
+                    "vmSize": "[variables('vmSizeKey')[parameters('vmSize')]"
+                },
+                "osProfile": {
+                    "computerName": "[parameters('vmName')]",
+                    "adminUsername": "[variables('defaultAdmin')]",
+                    "adminPassword": "[parameters('adminPassword')]"
+                },
+                "storageProfile": {
+                    "imageReference": {
+                        "publisher": "[variables('imagePublisher')]",
+                        "offer": "[variables('imageOffer')]",
+                        "sku": "[variables('imageSKU')]",
+                        "version": "[variables('imageVersion')]"
+                    },
+                    "osDisk": {
+                        "name": "[concat('DISK-', parameters('vmName'), '-OS']",
+                        "createOption": "FromImage",
+                        "diskSizeGB": "[variables('defaultOSDiskSize')]",
+                        "caching": "ReadWrite",
+                        "managedDisk": {
+                            "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]"
+                        }
+                    }
+                },
+                "networkProfile": {
+                    "networkInterfaces": [
+                        {
+                            "id": "[variables('vNICNameId')]"
+                        }
+                    ]
+                },
+                "diagnosticsProfile": {
+                    "bootDiagnostics": {
+                        "enabled": true,
+                        "storageUri": "[variables('diagAccountUri')]"
+                    }
+                }
             }
         }
     ],
