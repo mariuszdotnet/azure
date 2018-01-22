@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.11",
+    "contentVersion": "1.0.2.12",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -62,7 +62,7 @@
             }
         },
         "dataDisks512GB": {
-            "type": "string",
+            "type": "int",
             "defaultValue": "0",
             "metadata": {
                 "description": "How many 512GB data disks to provision?"
@@ -219,7 +219,23 @@
                         "managedDisk": {
                             "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
                         }
-                    }
+                    },
+                    "copy": [
+                        {
+                            "name": "dataDisks",
+                            "count": "[parameters('dataDisks512GB')]",
+                            "input": {
+                                "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-512-', copyIndex('dataDisks'))]",
+                                "lun": "[copyIndex('dataDisks')]",
+                                "diskSizeGB": 512,
+                                "createOption": "Empty",
+                                "caching":"ReadWrite",
+                                "managedDisk": {
+                                    "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
+                                }
+                            }
+                        }
+                    ]
                 },
                 "networkProfile": {
                     "networkInterfaces": [
