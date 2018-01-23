@@ -1,0 +1,1 @@
+Documents\Development\Azure_Templates_Github\Samples> New-AzureRmResourceGroupDeployment -Name xxx -ResourceGroupName Azure-Templates -TemplateFile .\test-copy.json

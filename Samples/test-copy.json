@@ -1,0 +1,46 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"disk_512": {
+			"type": "int",
+			"defaultValue": 1
+		},
+		"disk_1024": {
+			"type": "int",
+			"defaultValue": 3
+		}
+	},
+	"variables": {
+        "disks_512": {
+		    "copy": [
+		    	{
+			    	"name": "D1",
+		    		"count": "[parameters('disk_512')]",
+		    		"input": {
+		    		    "diskSizeGB": 512
+		    	    }
+		    	}
+            ]
+        },
+        "disks_1024": {
+            "copy": [
+		    	{
+		    		"name": "D2",
+			    	"count": "[parameters('disk_1024')]",
+				    "input": {
+				        "diskSizeGB": 1024
+			        }
+			    }
+            ]
+        },
+        "all_disks": "[concat(variables('disks_512').D1,variables('disks_1024').D2)]"
+    },
+	"resources": [],
+	"outputs": { 
+		"disk1": {
+			"type": "array",
+			"value": "[variables('all_disks')]"
+        }
+	}
+}
