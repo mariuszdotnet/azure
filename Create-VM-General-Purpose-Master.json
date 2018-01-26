@@ -90,6 +90,17 @@
             "metadata": {
                 "description": "Provide cost center"
             }
+        },
+        "installDefaultExtensions": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "allowedValues": [
+                "Yes",
+                "No"
+            ],
+            "metadata": {
+                "description": "Should default extensions be installed?"
+            }
         }
     },
     "variables": {
@@ -185,6 +196,19 @@
                 "policyId": "[variables('recoveryVaultPolicyNameId')]"
             }
         },
+        {
+            "condition": "[equals(parameters('installDefaultExtensions'),'Yes')]",
+            "name": "[concat(parameters('vmName'),'/', variables('defaultExtensionName'))]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2017-12-01",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[variables('vmNameId')]"
+            ],
+            "properties": {
+
+            }
+        },  
         {
             "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",
