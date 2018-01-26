@@ -33,29 +33,29 @@
             }
         }
     },
-    "variables": {
-        "resourceVaultRG": "[concat('VAULT-', toUpper(parameters('location')), toUpper(parameters('environment')))]",
-        "recoveryVaultName": "[concat('VAULT-', toUpper(parameters('location')), toUpper(parameters('environment')), '-1')]",
-        "recoveryVaultId": "[resourceId('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'))]"
-    },
+    "variables": { },
     "resources": [
         {
-            "name": "[variables('recoveryVaultName')]",
-            "type": "Microsoft.RecoveryServices/vaults",
-            "apiVersion": "2016-06-01",
-            "location": "[parameters('location')]",
-            "resourceGroup": "[variables('resourceVaultRG')]",
-            "sku": {
-                "name": "RS0",
-                "tier": "Standard"
-            },
-            "properties": { }
+            "name": "CreateRecoveryVault",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'Backup/Create-Recovery-Vault.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    }
+
+                }
+            }
         }
     ],
-    "outputs": {
-        "recoveryVaultId": {
-            "type": "string",
-            "value": "[variables('recoveryVaultId')]"
-        }
-    }
+    "outputs": { }
 }
