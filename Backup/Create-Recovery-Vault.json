@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+    "contentVersion": "1.0.0.2",
     "parameters": {
         "location": {
             "type": "string",
@@ -34,8 +34,7 @@
         }
     },
     "variables": {
-        "resourceVaultRG": "[concat('VAULT-', toUpper(parameters('location')), toUpper(parameters('environment')))]",
-        "recoveryVaultName": "[concat('VAULT-', toUpper(parameters('location')), toUpper(parameters('environment')), '-1')]",
+        "recoveryVaultName": "[concat('VAULT-', toUpper(parameters('location')), '-', toUpper(parameters('environment')), '-1')]",
         "recoveryVaultId": "[resourceId('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'))]"
     },
     "resources": [
@@ -44,7 +43,6 @@
             "type": "Microsoft.RecoveryServices/vaults",
             "apiVersion": "2016-06-01",
             "location": "[parameters('location')]",
-            "resourceGroup": "[variables('resourceVaultRG')]",
             "sku": {
                 "name": "RS0",
                 "tier": "Standard"
