@@ -1,25 +1,7 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.2",
+    "contentVersion": "1.0.0.3",
     "parameters": {
-        "location": {
-            "type": "string",
-            "allowedValues": [
-                "canadaeast",
-                "canadacentral",
-                "japaneast",
-                "japanwest",
-                "eastasia",
-                "southeastasia",
-                "eastus",
-                "eastus2",
-                "centralus",
-                "westus"
-            ],
-            "metadata": {
-                "description": "Azure region to deploy resource"
-            }
-        },
         "environment": {
             "type": "string",
             "allowedValues": [
@@ -33,24 +15,19 @@
             }
         }
     },
-    "variables": {
-        "recoveryVaultRG": "[concat('RECOVERY-VAULTS-', toUpper(parameters('location')))]"
-    },
+    "variables": { },
     "resources": [
         {
-            "name": "[concat('VAULT-', toUpper(parameters('location')), '-', toUpper(parameters('environment')), '-1')]",
+            "name": "[concat('RECOVERY-VAULT-', toUpper(resourceGroup().location), '-', toUpper(parameters('environment')), '-1')]",
             "apiVersion": "2017-05-10",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[uri(deployment().properties.templateLink.uri, 'Backup/Create-Recovery-Vault.json')]",
-                    "contentVersion": "1.0.0.2"
+                    "contentVersion": "1.0.0.3"
                 },
                 "parameters": {
-                    "location": {
-                        "value": "[parameters('location')]"
-                    },
                     "environment": {
                         "value": "[parameters('environment')]"
                     }

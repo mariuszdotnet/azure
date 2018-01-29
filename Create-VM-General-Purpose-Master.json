@@ -155,31 +155,6 @@
             }
         },
         {
-            "name": "[variables('diagAccountName')]",
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "Standard_LRS"
-            },
-            "kind": "StorageV2",
-            "properties": {
-                "accessTier": "Hot"
-            }
-        },
-        {
-            "condition": "[equals(parameters('backupService'),'Backup required')]",
-            "name": "[variables('recoveryVaultName')]",
-            "type": "Microsoft.RecoveryServices/vaults",
-            "apiVersion": "2016-06-01",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "RS0",
-                "tier": "Standard"
-            },
-            "properties": { }
-        },
-        {
             "condition": "[equals(parameters('backupService'),'Backup required')]",
             "name": "[concat(variables('recoveryVaultName'), variables('protectectioContainer'), variables('protectedItem'))]",
             "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
@@ -195,20 +170,7 @@
                 "sourceResourceId": "[variables('vmNameId')]",
                 "policyId": "[variables('recoveryVaultPolicyNameId')]"
             }
-        },
-        {
-            "condition": "[equals(parameters('installDefaultExtensions'),'Yes')]",
-            "name": "[concat(parameters('vmName'),'/', variables('defaultExtensionName'))]",
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2017-12-01",
-            "location": "[resourceGroup().location]",
-            "dependsOn": [
-                "[variables('vmNameId')]"
-            ],
-            "properties": {
-
-            }
-        },  
+        }, 
         {
             "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",

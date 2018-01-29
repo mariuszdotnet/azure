@@ -1,31 +1,13 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.2",
+    "contentVersion": "1.0.0.3",
     "parameters": {
-        "location": {
-            "type": "string",
-            "allowedValues": [
-                "canadaeast",
-                "canadacentral",
-                "japaneast",
-                "japanwest",
-                "eastasia",
-                "southeastasia",
-                "eastus",
-                "eastus2",
-                "centralus",
-                "westus"
-            ],
-            "metadata": {
-                "description": "Azure region to deploy resource"
-            }
-        },
         "environment": {
             "type": "string",
             "allowedValues": [
                 "prod",
                 "stage",
-                "deve",
+                "dev",
                 "test"
             ],
             "metadata": {
@@ -34,7 +16,7 @@
         }
     },
     "variables": {
-        "recoveryVaultName": "[concat('VAULT-', toUpper(parameters('location')), '-', toUpper(parameters('environment')), '-1')]",
+        "recoveryVaultName": "[concat('RECOVERY-VAULT-', toUpper(resourceGroup().location), '-', toUpper(parameters('environment')), '-1')]",
         "recoveryVaultId": "[resourceId('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'))]"
     },
     "resources": [
@@ -42,7 +24,7 @@
             "name": "[variables('recoveryVaultName')]",
             "type": "Microsoft.RecoveryServices/vaults",
             "apiVersion": "2016-06-01",
-            "location": "[parameters('location')]",
+            "location": "[resourceGroup().location]",
             "sku": {
                 "name": "RS0",
                 "tier": "Standard"
