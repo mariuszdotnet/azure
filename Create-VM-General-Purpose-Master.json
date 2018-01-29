@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.14",
+    "contentVersion": "1.0.2.15",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -212,7 +212,7 @@
                             "name": "dataDisks",
                             "count": "[parameters('dataDisks512GB')]",
                             "input": {
-                                "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-512-', copyIndex('dataDisks'))]",
+                                "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', copyIndex('dataDisks'))]",
                                 "lun": "[copyIndex('dataDisks')]",
                                 "diskSizeGB": 512,
                                 "createOption": "Empty",
