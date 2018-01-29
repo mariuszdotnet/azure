@@ -1,43 +1,21 @@
 {
-	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-	"contentVersion": "1.0.0.0",
-	"parameters": {
-        "location": {
-            "type": "string",
-            "allowedValues": [
-                "canadaeast",
-                "canadacentral",
-                "japaneast",
-                "japanwest",
-                "eastasia",
-                "southeastasia",
-                "eastus",
-                "eastus2",
-                "centralus",
-                "westus"
-            ],
-            "metadata": {
-                "description": "Azure region to deploy resource"
-            }
-        }
-    },
-	"variables": {
-        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]"
-    },
-	"resources": [
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": { },
+    "variables": { },
+    "resources": [
         {
-            "name": "[variables('diagAccountName')]",
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "Standard_LRS"
-            },
-            "kind": "StorageV2",
+            "name": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
             "properties": {
-                "accessTier": "Hot"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'Storage/Create-Diag-Account.json')]",
+                    "contentVersion": "1.0.0.0"
+                }
             }
         }
     ],
-	"outputs": { }
+    "outputs": { }
 }
