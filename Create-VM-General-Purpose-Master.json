@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.19",
+    "contentVersion": "1.0.2.20",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -126,7 +126,6 @@
         "defaultOSDiskSize": "128",
         "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
         "diagAccountRg": "[concat('DIAG-ACCOUNTS-', toUpper(resourceGroup().location))]",
-        "diagAccountNameId": "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
         "recoveryVaultName": "[concat('VAULT-',toUpper(resourceGroup().location),'-1')]",
         "defaultPolicyName": "DefaultPolicy",
         "recoveryVaultPolicyNameId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
@@ -231,8 +230,7 @@
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
-                        "enabled": true,
-                        "storageUri": "[concat(reference(concat(variables('diagAccountRg'), '/Microsoft.Storage/storageAccounts/', variables('diagAccountName')), '2017-10-01').primaryEndpoints.blob)]"
+                        "enabled": false
                     }
                 }
             }
