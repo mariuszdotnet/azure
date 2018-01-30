@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.16",
+    "contentVersion": "1.0.2.18",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -177,8 +177,7 @@
                 "CostCenter": "[parameters('costCenter')]"
             },
             "dependsOn": [
-                "[variables('vNICNameId')]",
-                "[variables('diagAccountNameId')]"
+                "[variables('vNICNameId')]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -232,7 +231,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('diagAccountName')), '2017-10-01').primaryEndpoints.blob)]"
+                        "storageUri": "[concat(reference(concat(resourceGroup().location, 'Microsoft.Storage/storageAccounts/', variables('diagAccountName')), '2017-10-01').primaryEndpoints.blob)]"
                     }
                 }
             }
