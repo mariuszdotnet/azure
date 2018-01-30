@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.13",
+    "contentVersion": "1.0.2.21",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -90,6 +90,17 @@
             "metadata": {
                 "description": "Provide cost center"
             }
+        },
+        "installDefaultExtensions": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "allowedValues": [
+                "Yes",
+                "No"
+            ],
+            "metadata": {
+                "description": "Should default extensions be installed?"
+            }
         }
     },
     "variables": {
@@ -114,12 +125,12 @@
         "imageVersion": "latest",
         "defaultOSDiskSize": "128",
         "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
-        "diagAccountNameId": "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
-        "recoveryVaultName": "[concat('VAULT-',toUpper(resourceGroup().location),'-1')]",
-        "recoveryVaultNameId": "[resourceId('Microsoft.RecoveryServices/vaults/', variables('recoveryVaultName'))]",
+        "diagAccountRg": "[concat('DIAG-ACCOUNTS-', toUpper(resourceGroup().location))]",
+        "diagAccountId": "[resourceId(subscription().subscriptionId, variables('diagAccountRg'), 'Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
         "defaultPolicyName": "DefaultPolicy",
-        "recoveryVaultPolicyName": "[concat(variables('recoveryVaultNameId'), '/', variables('defaultPolicyName'))]",
-        "recoveryVaultPolicyNameId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
+        "recoveryVaultName": "[concat('VAULT-',toUpper(resourceGroup().location),'-1')]",
+        "recoveryVaultRg": "[concat('REVOVERY-VAULTS-', toUpper(resourceGroup().location))]",
+        "recoveryVaultPolicyId": "[resourceId(subscription().subscriptionId, variables('recoveryVaultRg'),'Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
         "protectectioContainer": "[concat('/Azure/iaasvmcontainer;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
         "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]"
     },
@@ -144,47 +155,21 @@
             }
         },
         {
-            "name": "[variables('diagAccountName')]",
-            "type": "Microsoft.Storage/storageAccounts",
-            "apiVersion": "2017-10-01",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "Standard_LRS"
-            },
-            "kind": "StorageV2",
-            "properties": {
-                "accessTier": "Hot"
-            }
-        },
-        {
-            "condition": "[equals(parameters('backupService'),'Backup required')]",
-            "name": "[variables('recoveryVaultName')]",
-            "type": "Microsoft.RecoveryServices/vaults",
-            "apiVersion": "2016-06-01",
-            "location": "[resourceGroup().location]",
-            "sku": {
-                "name": "RS0",
-                "tier": "Standard"
-            },
-            "properties": { }
-        },
-        {
             "condition": "[equals(parameters('backupService'),'Backup required')]",
             "name": "[concat(variables('recoveryVaultName'), variables('protectectioContainer'), variables('protectedItem'))]",
             "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
             "apiVersion": "2016-12-01",
             "location": "[resourceGroup().location]",
             "dependsOn": [
-                "[variables('recoveryVaultNameId')]",
                 "[variables('vmNameId')]"
             ],
             "properties": {
                 "protectedItemType": "Microsoft.Compute/virtualMachines",
                 "workloadType": "VM",
                 "sourceResourceId": "[variables('vmNameId')]",
-                "policyId": "[variables('recoveryVaultPolicyNameId')]"
+                "policyId": "[variables('recoveryVaultPolicyId')]"
             }
-        },
+        }, 
         {
             "name": "[parameters('vmName')]",
             "type": "Microsoft.Compute/virtualMachines",
@@ -194,8 +179,7 @@
                 "CostCenter": "[parameters('costCenter')]"
             },
             "dependsOn": [
-                "[variables('vNICNameId')]",
-                "[variables('diagAccountNameId')]"
+                "[variables('vNICNameId')]"
             ],
             "properties": {
                 "hardwareProfile": {
@@ -227,7 +211,7 @@
                             "name": "dataDisks",
                             "count": "[parameters('dataDisks512GB')]",
                             "input": {
-                                "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-512-', copyIndex('dataDisks'))]",
+                                "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', copyIndex('dataDisks'))]",
                                 "lun": "[copyIndex('dataDisks')]",
                                 "diskSizeGB": 512,
                                 "createOption": "Empty",
@@ -249,7 +233,7 @@
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
                         "enabled": true,
-                        "storageUri": "[concat(reference(concat('Microsoft.Storage/storageAccounts/', variables('diagAccountName')), '2017-10-01').primaryEndpoints.blob)]"
+                        "storageUri": "[reference(variables('diagAccountId') , '2017-10-01').primaryEndpoints.blob]"
                     }
                 }
             }

@@ -1,0 +1,40 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.4",
+    "parameters": {
+        "environment": {
+            "type": "string",
+            "allowedValues": [
+                "prod",
+                "stage",
+                "dev",
+                "test"
+            ],
+            "metadata": {
+                "description": "Environment type"
+            }
+        }
+    },
+    "variables": { },
+    "resources": [
+        {
+            "name": "[concat('RECOVERY-VAULT-', toUpper(resourceGroup().location), '-', toUpper(parameters('environment')), '-1')]",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'Backup/Create-Recovery-Vault.json')]",
+                    "contentVersion": "1.0.0.3"
+                },
+                "parameters": {
+                    "environment": {
+                        "value": "[parameters('environment')]"
+                    }
+
+                }
+            }
+        }
+    ],
+    "outputs": { }
+}

@@ -22,10 +22,5 @@
             }
         }
     ],
-    "outputs": {
-        "greetingMessage": {
-            "type": "string",
-            "value": "Hello World"
-        }
-    }
+    "outputs": { }
 }
