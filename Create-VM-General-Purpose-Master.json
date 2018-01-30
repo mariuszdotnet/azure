@@ -125,7 +125,7 @@
         "imageVersion": "latest",
         "defaultOSDiskSize": "128",
         "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
-        "diagAccountRg": "[concat('DIAG-ACCOUNTS-', toUpper(resourceGroup().location))]"
+        "diagAccountRg": "[concat('DIAG-ACCOUNTS-', toUpper(resourceGroup().location))]",
         "diagAccountNameId": "[resourceId('Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
         "recoveryVaultName": "[concat('VAULT-',toUpper(resourceGroup().location),'-1')]",
         "defaultPolicyName": "DefaultPolicy",
