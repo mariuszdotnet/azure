@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.20",
+    "contentVersion": "1.0.2.21",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -126,9 +126,11 @@
         "defaultOSDiskSize": "128",
         "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
         "diagAccountRg": "[concat('DIAG-ACCOUNTS-', toUpper(resourceGroup().location))]",
-        "recoveryVaultName": "[concat('VAULT-',toUpper(resourceGroup().location),'-1')]",
+        "diagAccountId": "[resourceId(subscription().subscriptionId, variables('diagAccountRg'), 'Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
         "defaultPolicyName": "DefaultPolicy",
-        "recoveryVaultPolicyNameId": "[resourceId('Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
+        "recoveryVaultName": "[concat('VAULT-',toUpper(resourceGroup().location),'-1')]",
+        "recoveryVaultRg": "[concat('REVOVERY-VAULTS-', toUpper(resourceGroup().location))]",
+        "recoveryVaultPolicyId": "[resourceId(subscription().subscriptionId, variables('recoveryVaultRg'),'Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
         "protectectioContainer": "[concat('/Azure/iaasvmcontainer;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
         "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]"
     },
@@ -165,7 +167,7 @@
                 "protectedItemType": "Microsoft.Compute/virtualMachines",
                 "workloadType": "VM",
                 "sourceResourceId": "[variables('vmNameId')]",
-                "policyId": "[variables('recoveryVaultPolicyNameId')]"
+                "policyId": "[variables('recoveryVaultPolicyId')]"
             }
         }, 
         {
@@ -230,7 +232,8 @@
                 },
                 "diagnosticsProfile": {
                     "bootDiagnostics": {
-                        "enabled": false
+                        "enabled": true,
+                        "storageUri": "[reference(variables('diagAccountId') , '2017-10-01').primaryEndpoints.blob]"
                     }
                 }
             }
