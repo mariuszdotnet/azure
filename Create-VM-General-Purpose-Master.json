@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.21",
+    "contentVersion": "1.0.2.22",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -91,7 +91,7 @@
                 "description": "Provide cost center"
             }
         },
-        "installDefaultExtensions": {
+        "installOMSExtension": {
             "type": "string",
             "defaultValue": "Yes",
             "allowedValues": [
@@ -132,9 +132,52 @@
         "recoveryVaultRg": "[concat('REVOVERY-VAULTS-', toUpper(resourceGroup().location))]",
         "recoveryVaultPolicyId": "[resourceId(subscription().subscriptionId, variables('recoveryVaultRg'),'Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
         "protectectioContainer": "[concat('/Azure/iaasvmcontainer;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
-        "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]"
+        "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
+        "omsWorkspaceId": "[variables(concat('oms_', toLower(resourceGroup().location)))['id']]",
+        "omsWorkspaceKey": "[variables(concat('oms_', toLower(resourceGroup().location)))['key']]",
+        "omsWorkspaceNorthAmerica": {
+            "id": "01934c67-8c36-4f36-9319-3c3efa5f53e6",
+            "key": "6r4XJ8yBy7x7Q7Vjxabg7lM/kFGylnR4fcxKSFOjcSl1vNc3+r01t6xyitTI3dEKyjfsdf4F6egyCNOOvp0Rvg=="
+        },
+        "omsWorkspaceAsia": {
+            "id": "01934c67-8c36-4f36-9319-3c3efa5f53e6",
+            "key": "6r4XJ8yBy7x7Q7Vjxabg7lM/kFGylnR4fcxKSFOjcSl1vNc3+r01t6xyitTI3dEKyjfsdf4F6egyCNOOvp0Rvg=="
+        },
+        "oms_eastasia": "[variables('omsWorkspaceAsia')]",
+        "oms_southeastasia": "[variables('omsWorkspaceAsia')]",
+        "oms_centralus": "[variables('omsWorkspaceAsia')]",
+        "oms_eastus": "[variables('omsWorkspaceAsia')]",
+        "oms_eastus2": "[variables('omsWorkspaceAsia')]",
+        "oms_westus": "[variables('omsWorkspaceAsia')]",
+        "oms_centralus": "[variables('omsWorkspaceAsia')]",
+        "oms_canadacentral": "[variables('omsWorkspaceAsia')]",
+        "oms_canadaeast": "[variables('omsWorkspaceAsia')]",
+        "oms_japaneast": "[variables('omsWorkspaceAsia')]",
+        "oms_japanwest": "[variables('omsWorkspaceAsia')]"
     },
     "resources": [
+        {
+            "condition": "[equals(parameters('installOMSExtension'),'Yes')]",
+            "name": "[concat(parameters('vmName'),'/', 'OMSExtension')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2017-03-30",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[variables('vmNameId')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.EnterpriseCloud.Monitoring",
+                "type": "MicrosoftMonitoringAgent",
+                "typeHandlerVersion": "1.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "workspaceId": "[variables('omsWorkspaceId')]"
+                },
+                "protectedSettings": {
+                    "workspaceKey": "[variables('omsWorkspaceKey')]"
+                }
+            }
+        },
         {
             "name": "[variables('vNICName')]",
             "apiVersion": "2017-06-01",
