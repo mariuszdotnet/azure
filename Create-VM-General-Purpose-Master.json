@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.21",
+    "contentVersion": "1.0.2.23",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -91,7 +91,7 @@
                 "description": "Provide cost center"
             }
         },
-        "installDefaultExtensions": {
+        "installOMSExtension": {
             "type": "string",
             "defaultValue": "Yes",
             "allowedValues": [
@@ -135,6 +135,25 @@
         "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]"
     },
     "resources": [
+        {
+            "condition": "[equals(parameters('installOMSExtension'),'Yes')]",
+            "name": "OMSExtension",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'Extensions/OMS-Extension.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vmName": {
+                        "value": "[parameters('vmName')]"
+                    }
+
+                }
+            }
+        },
         {
             "name": "[variables('vNICName')]",
             "apiVersion": "2017-06-01",
