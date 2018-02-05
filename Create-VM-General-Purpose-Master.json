@@ -132,7 +132,7 @@
         "imageSKU": "2016-Datacenter",
         "imageVersion": "latest",
         "defaultOSDiskSize": "128",
-        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
+        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location)]",
         "diagAccountRg": "[concat('DIAG-ACCOUNTS-', toUpper(resourceGroup().location))]",
         "diagAccountId": "[resourceId(subscription().subscriptionId, variables('diagAccountRg'), 'Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
         "defaultPolicyName": "DefaultPolicy",
@@ -164,7 +164,7 @@
         },
         {
             "condition": "[equals(parameters('installSEP'),'Yes')]",
-            "name": "SymantecEndpointProtection",
+            "name": "[concat(parameters('vmName'), '/SymantecEndpointProtection')]",
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2015-06-15",
             "location": "[resourceGroup().location]",
@@ -182,7 +182,7 @@
                     ]
                 },
                 "protectedSettings": {
-                    "commandToExecute": "Install-SEP.ps1",
+                    "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File Install-SEP.ps1",
                     "storageAccountName": "customscriptautomation",
                     "storageAccountKey": "/3NvuXZRMWCw6vC0xRGnIVmX/HEim7e9wbbzlGa5lJ3XV4aFvK4cMB8+S87YPOscadeT0SgV52PBB+dHdkmx2g=="
                 }
