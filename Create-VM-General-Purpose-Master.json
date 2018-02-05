@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.2.23",
+    "contentVersion": "1.0.2.24",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -101,6 +101,14 @@
             "metadata": {
                 "description": "Should default extensions be installed?"
             }
+        },
+        "installSEP": {
+            "type": "string",
+            "defaultValue": "Yes",
+            "allowedValues": [
+                "Yes",
+                "No"
+            ]
         }
     },
     "variables": {
@@ -124,7 +132,7 @@
         "imageSKU": "2016-Datacenter",
         "imageVersion": "latest",
         "defaultOSDiskSize": "128",
-        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
+        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location)]",
         "diagAccountRg": "[concat('DIAG-ACCOUNTS-', toUpper(resourceGroup().location))]",
         "diagAccountId": "[resourceId(subscription().subscriptionId, variables('diagAccountRg'), 'Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
         "defaultPolicyName": "DefaultPolicy",
@@ -151,6 +159,32 @@
                         "value": "[parameters('vmName')]"
                     }
 
+                }
+            }
+        },
+        {
+            "condition": "[equals(parameters('installSEP'),'Yes')]",
+            "name": "[concat(parameters('vmName'), '/SymantecEndpointProtection')]",
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[variables('vmNameId')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Compute",
+                "type": "CustomScriptExtension",
+                "typeHandlerVersion": "1.9",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": [
+                        "https://customscriptautomation.blob.core.windows.net/sep/Install-SEP.ps1"
+                    ]
+                },
+                "protectedSettings": {
+                    "commandToExecute": "powershell.exe -ExecutionPolicy Unrestricted -File Install-SEP.ps1",
+                    "storageAccountName": "customscriptautomation",
+                    "storageAccountKey": "/3NvuXZRMWCw6vC0xRGnIVmX/HEim7e9wbbzlGa5lJ3XV4aFvK4cMB8+S87YPOscadeT0SgV52PBB+dHdkmx2g=="
                 }
             }
         },
