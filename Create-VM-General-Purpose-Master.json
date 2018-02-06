@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.3.7",
+    "contentVersion": "1.0.3.8",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -159,16 +159,13 @@
         "recoveryVaultPolicyId": "[resourceId(subscription().subscriptionId, variables('recoveryVaultRg'),'Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
         "protectectioContainer": "[concat('/Azure/iaasvmcontainer;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
         "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
-        "lunIndex128": 0,
-        "lunIndex512": "[add(variables('lunIndex128'), parameters('dataDisks128GB'))]",
-        "lunIndex1023": "[add(variables('lunIndex512'), parameters('dataDisks512GB'))]",
         "copy": [
             {
                 "name": "dataDisks128",
                 "count": "[if(equals(parameters('dataDisks128GB'),0),1, parameters('dataDisks128GB'))]",
                 "input": {
                     "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', copyIndex('dataDisks128'))]",
-                    "lun": "[add( variables('lunIndex128'), copyIndex('dataDisks128'))]",
+                    "lun": "[copyIndex('dataDisks128')]",
                     "createOption": "Empty",
                     "caching": "ReadWrite",
                     "diskSizeGB": 128,
@@ -181,8 +178,8 @@
                 "name": "dataDisks512",
                 "count": "[if(equals(parameters('dataDisks512GB'),0),1, parameters('dataDisks512GB'))]",
                 "input": {
-                    "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', copyIndex('dataDisks512'))]",
-                    "lun": "[add(variables('lunIndex512'),copyIndex('dataDisks512'))]",
+                    "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', add(parameters('dataDisks128GB'),copyIndex('dataDisks512')))]",
+                    "lun": "[add(parameters('dataDisks128GB'),copyIndex('dataDisks512'))]",
                     "createOption": "Empty",
                     "caching": "ReadWrite",
                     "diskSizeGB": 512,
@@ -195,8 +192,8 @@
                 "name": "dataDisks1023",
                 "count": "[if(equals(parameters('dataDisks1TB'),0),1, parameters('dataDisks1TB'))]",
                 "input": {
-                    "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', add(parameters('dataDisks512GB'), copyIndex('dataDisks1023')))]",
-                    "lun": "[add(variables('lunIndex1023'), copyIndex('dataDisks1023'))]",
+                    "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', add(add(parameters('dataDisks128GB'), parameters('dataDisks512GB')), copyIndex('dataDisks1023')))]",
+                    "lun": "[add(add(parameters('dataDisks128GB'), parameters('dataDisks512GB')), copyIndex('dataDisks1023'))]",
                     "createOption": "Empty",
                     "caching": "ReadWrite",
                     "diskSizeGB": 1023,
