@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.3.2",
+    "contentVersion": "1.0.3.4",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -68,6 +68,15 @@
             "maxValue": 16,
             "metadata": {
                 "description": "How many 512GB data disks to provision?"
+            }
+        },
+        "dataDisks1TB": {
+            "type": "int",
+            "defaultValue": 0,
+            "minValue": 0,
+            "maxValue": 16,
+            "metadata": {
+                "description": "How many 1TB data disks to provision?"
             }
         },
         "virtualNetwork": {
@@ -143,14 +152,30 @@
         "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
         "copy": [
             {
-                "name": "dataDisks",
+                "name": "dataDisks512",
                 "count": "[if(equals(parameters('dataDisks512GB'),0),1, parameters('dataDisks512GB'))]",
                 "input": {
-                    "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', copyIndex('dataDisks'))]",
-                    "lun": "[copyIndex('dataDisks')]",
+                    "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', copyIndex('dataDisks512'))]",
+                    "lun": "[copyIndex('dataDisks512')]",
                     "createOption": "Empty",
                     "caching": "ReadWrite",
                     "diskSizeGB": 512,
+                    "managedDisk": {
+                        "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
+                    }   
+                }
+            }
+        ],
+        "copy": [
+            {
+                "name": "dataDisks1023",
+                "count": "[if(equals(parameters('dataDisks1TB'),0),1, parameters('dataDisks1TB'))]",
+                "input": {
+                    "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', add(parameters('dataDisks512GB'), copyIndex('dataDisks1023')))]",
+                    "lun": "[add(parameters('dataDisks512GB'), copyIndex('dataDisks1023'))]",
+                    "createOption": "Empty",
+                    "caching": "ReadWrite",
+                    "diskSizeGB": 1023,
                     "managedDisk": {
                         "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
                     }   
@@ -275,7 +300,7 @@
                             "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
                         }
                     },
-                    "dataDisks": "[if(equals(parameters('dataDisks512GB'),0),json('null'),variables('dataDisks'))]"  
+                    "dataDisks": "[if(equals(parameters('dataDisks512GB'),0), json('null'), variables('dataDisks512'))]"  
                 },
                 "networkProfile": {
                     "networkInterfaces": [
