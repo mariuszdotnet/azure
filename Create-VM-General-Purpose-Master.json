@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.3.0",
+    "contentVersion": "1.0.3.1",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -64,7 +64,7 @@
         "dataDisks512GB": {
             "type": "int",
             "defaultValue": 0,
-            "minValue": 1,
+            "minValue": 0,
             "maxValue": 16,
             "metadata": {
                 "description": "How many 512GB data disks to provision?"
