@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.3.4",
+    "contentVersion": "1.0.3.6",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -59,6 +59,15 @@
             ],
             "metadata": {
                 "description": "Select storage type"
+            }
+        },
+        "dataDisks128GB": {
+            "type": "int",
+            "defaultValue": 0,
+            "minValue": 0,
+            "maxValue": 16,
+            "metadata": {
+                "description": "How many 128GB data disks to provision?"
             }
         },
         "dataDisks512GB": {
@@ -150,13 +159,30 @@
         "recoveryVaultPolicyId": "[resourceId(subscription().subscriptionId, variables('recoveryVaultRg'),'Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
         "protectectioContainer": "[concat('/Azure/iaasvmcontainer;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
         "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
+        "lunIndex128": 0,
+        "lunIndex512": "[add(variables('lunIndex128'), parameters('dataDisks128GB'))]",
+        "lunIndex1023": "[add(variables('lunIndex512'), parameters('dataDisks512GB'))]"
         "copy": [
+            {
+                "name": "dataDisks128",
+                "count": "[if(equals(parameters('dataDisks128GB'),0),1, parameters('dataDisks128GB'))]",
+                "input": {
+                    "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', copyIndex('dataDisks128'))]",
+                    "lun": "[add( variables('lunIndex128'), copyIndex('dataDisks128'))]",
+                    "createOption": "Empty",
+                    "caching": "ReadWrite",
+                    "diskSizeGB": 128,
+                    "managedDisk": {
+                        "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
+                    }   
+                }
+            },
             {
                 "name": "dataDisks512",
                 "count": "[if(equals(parameters('dataDisks512GB'),0),1, parameters('dataDisks512GB'))]",
                 "input": {
                     "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', copyIndex('dataDisks512'))]",
-                    "lun": "[copyIndex('dataDisks512')]",
+                    "lun": "[add(variables('lunIndex512'),copyIndex('dataDisks512'))]",
                     "createOption": "Empty",
                     "caching": "ReadWrite",
                     "diskSizeGB": 512,
@@ -164,15 +190,13 @@
                         "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
                     }   
                 }
-            }
-        ],
-        "copy": [
+            },
             {
                 "name": "dataDisks1023",
                 "count": "[if(equals(parameters('dataDisks1TB'),0),1, parameters('dataDisks1TB'))]",
                 "input": {
                     "name": "[concat('DISK-', toUpper(parameters('vmName')), '-DATA-', add(parameters('dataDisks512GB'), copyIndex('dataDisks1023')))]",
-                    "lun": "[add(parameters('dataDisks512GB'), copyIndex('dataDisks1023'))]",
+                    "lun": "[add(variables('lunIndex1023'), copyIndex('dataDisks1023'))]",
                     "createOption": "Empty",
                     "caching": "ReadWrite",
                     "diskSizeGB": 1023,
@@ -181,7 +205,12 @@
                     }   
                 }
             }
-        ]
+        ],
+    "zero": [],
+    "disk128": "[if(equals(parameters('dataDisks128GB'),0), variables('zero'), variables('dataDisks128'))]",
+    "disk512": "[if(equals(parameters('dataDisks512GB'),0), variables('zero'), variables('dataDisks512'))]",
+    "disk1023": "[if(equals(parameters('dataDisks1TB'),0), variables('zero'), variables('dataDisks1023'))]",
+    "allDataDisks": "[concat(variables('disk128'), variables('disk512'), variables('disk1023'))]"
     },
     "resources": [
         {
@@ -300,7 +329,7 @@
                             "storageAccountType": "[variables('storageTypeKey')[parameters('storageType')]]"
                         }
                     },
-                    "dataDisks": "[if(equals(parameters('dataDisks512GB'),0), json('null'), variables('dataDisks512'))]"  
+                    "dataDisks": "[variables('allDataDisks')]"  
                 },
                 "networkProfile": {
                     "networkInterfaces": [
