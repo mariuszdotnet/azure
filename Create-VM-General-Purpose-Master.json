@@ -161,7 +161,7 @@
         "protectedItem": "[concat('/vm;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
         "lunIndex128": 0,
         "lunIndex512": "[add(variables('lunIndex128'), parameters('dataDisks128GB'))]",
-        "lunIndex1023": "[add(variables('lunIndex512'), parameters('dataDisks512GB'))]"
+        "lunIndex1023": "[add(variables('lunIndex512'), parameters('dataDisks512GB'))]",
         "copy": [
             {
                 "name": "dataDisks128",
