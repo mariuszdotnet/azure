@@ -35,7 +35,7 @@
                         "properties": {
                             "privateIPAllocationMethod": "Static",
                             "subnet": {
-                                "id": "[reference(parameters('vNICNameId')).ipConfigurations[0].properties.privateIPAddress]"
+                                "id": "[parameters('vNICIP')]"
                             }
                         }
                     }
