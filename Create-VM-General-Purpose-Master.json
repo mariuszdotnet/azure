@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.4.1",
+    "contentVersion": "1.0.4.2",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -275,6 +275,25 @@
                         }
                     }
                 ]
+            }
+        },
+        {
+            "name": "SettingStaticIP",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[variables('vNICNameId')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'Network/Set-StaticIP.json')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "vNICName": "[variables('vNICName')]",
+                    "vNICNameId": "[variables('vNICNameId')]"
+                }
             }
         },
         {

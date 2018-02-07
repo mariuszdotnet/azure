@@ -1,0 +1,41 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "vNICName": {
+            "type": "string",
+            "metadata": {
+                "description": "Spicify vNic name"
+            }
+        },
+        "vNICNameId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify vNicId"
+            }
+        }
+    },
+    "variables": { },
+    "resources": [ 
+        {
+            "name": "[parameters('vNICName')]",
+            "apiVersion": "2017-06-01",
+            "type": "Microsoft.Network/networkInterfaces",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "ipConfigurations":[
+                    {
+                        "name": "ipconfig1",
+                        "properties": {
+                            "privateIPAllocationMethod": "Static",
+                            "subnet": {
+                                "id": "[reference(parameters('vNICNameId')).ipConfigurations[0].properties.privateIPAddress]"
+                            }
+                        }
+                    }
+                ]
+            }
+        }
+    ],
+    "outputs": { }
+}
