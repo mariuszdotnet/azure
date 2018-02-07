@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.4.7",
+    "contentVersion": "1.0.4.8",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -104,7 +104,7 @@
         },
         "costCenter": {
             "type": "string",
-            "defaultValue": "1234",
+            "defaultValue": "9800",
             "metadata": {
                 "description": "Provide cost center"
             }
