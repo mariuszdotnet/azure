@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.4.4",
+    "contentVersion": "1.0.4.5",
     "parameters": {
         "vmName": {
             "type": "string",
