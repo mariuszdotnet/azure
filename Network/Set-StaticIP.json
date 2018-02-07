@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.3",
+    "contentVersion": "1.0.0.4",
     "parameters": {
         "vNICName": {
             "type": "string",
@@ -18,12 +18,6 @@
             "type": "string",
             "metadata": {
                 "description": "Provide static IP"
-            }
-        },
-        "subnetId": {
-            "type": "string",
-            "metadata": {
-                "description": "Provide subnet ID"
             }
         }
     },

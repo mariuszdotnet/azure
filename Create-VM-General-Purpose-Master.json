@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.4.5",
+    "contentVersion": "1.0.4.6",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -288,7 +288,7 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[uri(deployment().properties.templateLink.uri, 'Network/Set-StaticIP.json')]",
-                    "contentVersion": "1.0.0.3"
+                    "contentVersion": "1.0.0.4"
                 },
                 "parameters": {
                     "vNICName": {
