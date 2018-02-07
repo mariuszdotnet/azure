@@ -1,6 +1,6 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.4",
+    "contentVersion": "1.0.0.5",
     "parameters": {
         "vNICName": {
             "type": "string",
@@ -8,16 +8,16 @@
                 "description": "Spicify vNicName"
             }
         },
-        "vNICNameId": {
-            "type": "string",
-            "metadata": {
-                "description": "Specify vNicId"
-            }
-        },
         "vNICIP": {
             "type": "string",
             "metadata": {
-                "description": "Provide static IP"
+                "description": "Specify static IP"
+            }
+        },
+        "vNICSubnetId": {
+            "type": "string",
+            "metadata": {
+                "description": "Specify subnetId"
             }
         }
     },
@@ -34,7 +34,10 @@
                         "name": "ipconfig1",
                         "properties": {
                             "privateIPAllocationMethod": "Static",
-                            "privateIPAddress": "[parameters('vNICIP')]"
+                            "privateIPAddress": "[parameters('vNICIP')]",
+                            "subnet": {
+                                "id": "[parameters('vNICSubnetId')]"
+                            }
                         }
                     }
                 ]
