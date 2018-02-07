@@ -13,6 +13,12 @@
             "metadata": {
                 "description": "Specify vNicId"
             }
+        },
+        "vNICIP": {
+            "type": "string",
+            "metadata": {
+                "description": "Provide static IP"
+            }
         }
     },
     "variables": { },
