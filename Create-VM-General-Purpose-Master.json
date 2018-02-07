@@ -90,14 +90,14 @@
         },
         "virtualNetwork": {
             "type": "string",
-            "defaultValue": "MFCv2-GlobalControlZone-USE2-S1",
+            "defaultValue": "MFCv2-Internal-CAC-Development-S1",
             "metadata": {
                 "description": "Select vNet"
             }
         },
         "subnet": {
             "type": "string",
-            "defaultValue": "Internal-1",
+            "defaultValue": "Presentation",
             "metadata": {
                 "description": "select subnet"
             }
