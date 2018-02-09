@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.5.1",
+    "contentVersion": "1.0.5.2",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -317,18 +317,37 @@
         },
         {
             "condition": "[equals(parameters('backupService'),'Backup required')]",
-            "name": "[concat(variables('recoveryVaultName'), variables('protectectioContainer'), variables('protectedItem'))]",
-            "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
-            "apiVersion": "2016-12-01",
-            "location": "[resourceGroup().location]",
+            "name": "nestedTemplateRecoveryServices",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[variables('recoveryVaultRg')]",
             "dependsOn": [
                 "[variables('vmNameId')]"
             ],
             "properties": {
-                "protectedItemType": "Microsoft.Compute/virtualMachines",
-                "workloadType": "VM",
-                "sourceResourceId": "[variables('vmNameId')]",
-                "policyId": "[variables('recoveryVaultPolicyId')]"
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "paramters": {},
+                    "variables": {},
+                    "resources": [
+                        {
+                            "name": "[concat(variables('recoveryVaultName'), variables('protectectioContainer'), variables('protectedItem'))]",
+                            "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+                            "apiVersion": "2016-12-01",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "protectedItemType": "Microsoft.Compute/virtualMachines",
+                                "workloadType": "VM",
+                                "sourceResourceId": "[variables('vmNameId')]",
+                                "policyId": "[variables('recoveryVaultPolicyId')]"
+                            }
+                        }
+                    ]
+                },
+                "parameters": {},
+                "outputs": {}
             }
         }, 
         {
