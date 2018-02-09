@@ -1,12 +1,24 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.4.1",
+    "contentVersion": "1.0.5.3",
     "parameters": {
         "vmName": {
             "type": "string",
             "defaultValue": "AZWAPPT1",
             "metadata": {
                 "description": "Specify VM name"
+            }
+        },
+        "environment": {
+            "type": "string",
+            "allowedValues": [
+                "prod",
+                "stage",
+                "dev",
+                "test"
+            ],
+            "metadata": {
+                "description": "Environment type"
             }
         },
         "attachDomain": {
@@ -90,21 +102,21 @@
         },
         "virtualNetwork": {
             "type": "string",
-            "defaultValue": "MFCv2-GlobalControlZone-USE2-S1",
+            "defaultValue": "MFCv2-Internal-CAC-Development-S1",
             "metadata": {
                 "description": "Select vNet"
             }
         },
         "subnet": {
             "type": "string",
-            "defaultValue": "Internal-1",
+            "defaultValue": "Presentation",
             "metadata": {
                 "description": "select subnet"
             }
         },
         "costCenter": {
             "type": "string",
-            "defaultValue": "1234",
+            "defaultValue": "9800",
             "metadata": {
                 "description": "Provide cost center"
             }
@@ -150,11 +162,11 @@
         "imageSKU": "2016-Datacenter",
         "imageVersion": "latest",
         "defaultOSDiskSize": "128",
-        "diagAccountName": "[concat('gp7vmdiag',resourceGroup().location)]",
+        "diagAccountName": "[concat('vmdiag',uniqueString(subscription().subscriptionId, resourceGroup().location))]",
         "diagAccountRg": "[concat('DIAG-ACCOUNTS-', toUpper(resourceGroup().location))]",
         "diagAccountId": "[resourceId(subscription().subscriptionId, variables('diagAccountRg'), 'Microsoft.Storage/storageAccounts/', variables('diagAccountName'))]",
         "defaultPolicyName": "DefaultPolicy",
-        "recoveryVaultName": "[concat('VAULT-',toUpper(resourceGroup().location),'-1')]",
+        "recoveryVaultName": "[concat('RECOVERY-VAULT-', toUpper(resourceGroup().location), '-', toUpper(parameters('environment')), '-1')]",
         "recoveryVaultRg": "[concat('REVOVERY-VAULTS-', toUpper(resourceGroup().location))]",
         "recoveryVaultPolicyId": "[resourceId(subscription().subscriptionId, variables('recoveryVaultRg'),'Microsoft.RecoveryServices/vaults/backupPolicies', variables('recoveryVaultName'), variables('defaultPolicyName') )]",
         "protectectioContainer": "[concat('/Azure/iaasvmcontainer;iaasvmcontainerv2;', resourceGroup().name, ';', parameters('vmName'))]",
@@ -278,19 +290,60 @@
             }
         },
         {
+            "name": "SettingStaticIP",
+            "apiVersion": "2017-05-10",
+            "type": "Microsoft.Resources/deployments",
+            "dependsOn": [
+                "[variables('vNICNameId')]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[uri(deployment().properties.templateLink.uri, 'Network/Set-StaticIP.json')]",
+                    "contentVersion": "1.0.0.5"
+                },
+                "parameters": {
+                    "vNICName": {
+                        "value": "[variables('vNICName')]"
+                    },
+                    "vNICIP": {
+                        "value": "[reference(variables('vNICNameId')).ipConfigurations[0].properties.privateIPAddress]"
+                    },
+                    "vNICSubnetId": {
+                        "value": "[variables('subnetId')]"
+                    }
+                }
+            }
+        },
+        {
             "condition": "[equals(parameters('backupService'),'Backup required')]",
-            "name": "[concat(variables('recoveryVaultName'), variables('protectectioContainer'), variables('protectedItem'))]",
-            "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
-            "apiVersion": "2016-12-01",
-            "location": "[resourceGroup().location]",
+            "name": "nestedTemplateRecoveryServices",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2017-05-10",
+            "resourceGroup": "[variables('recoveryVaultRg')]",
             "dependsOn": [
                 "[variables('vmNameId')]"
             ],
             "properties": {
-                "protectedItemType": "Microsoft.Compute/virtualMachines",
-                "workloadType": "VM",
-                "sourceResourceId": "[variables('vmNameId')]",
-                "policyId": "[variables('recoveryVaultPolicyId')]"
+                "mode": "Incremental",
+                "template": {
+                    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+                    "contentVersion": "1.0.0.0",
+                    "resources": [
+                        {
+                            "name": "[concat(variables('recoveryVaultName'), variables('protectectioContainer'), variables('protectedItem'))]",
+                            "type": "Microsoft.RecoveryServices/vaults/backupFabrics/protectionContainers/protectedItems",
+                            "apiVersion": "2016-12-01",
+                            "location": "[resourceGroup().location]",
+                            "properties": {
+                                "protectedItemType": "Microsoft.Compute/virtualMachines",
+                                "workloadType": "VM",
+                                "sourceResourceId": "[variables('vmNameId')]",
+                                "policyId": "[variables('recoveryVaultPolicyId')]"
+                            }
+                        }
+                    ]
+                }
             }
         }, 
         {

@@ -1,18 +1,18 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
+    "contentVersion": "1.0.0.1",
     "parameters": { },
     "variables": { },
     "resources": [
         {
-            "name": "[concat('gp7vmdiag',resourceGroup().location,'001')]",
+            "name": "[concat('vmdiag',uniqueString(subscription().subscriptionId, resourceGroup().location))]",
             "apiVersion": "2017-05-10",
             "type": "Microsoft.Resources/deployments",
             "properties": {
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[uri(deployment().properties.templateLink.uri, 'Storage/Create-Diag-Account.json')]",
-                    "contentVersion": "1.0.0.1"
+                    "contentVersion": "1.0.0.2"
                 }
             }
         }
