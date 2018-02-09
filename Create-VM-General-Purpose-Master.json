@@ -1,6 +1,6 @@
 {
     "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.5.2",
+    "contentVersion": "1.0.5.3",
     "parameters": {
         "vmName": {
             "type": "string",
@@ -329,8 +329,6 @@
                 "template": {
                     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
                     "contentVersion": "1.0.0.0",
-                    "paramters": {},
-                    "variables": {},
                     "resources": [
                         {
                             "name": "[concat(variables('recoveryVaultName'), variables('protectectioContainer'), variables('protectedItem'))]",
@@ -345,9 +343,7 @@
                             }
                         }
                     ]
-                },
-                "parameters": {},
-                "outputs": {}
+                }
             }
         }, 
         {
