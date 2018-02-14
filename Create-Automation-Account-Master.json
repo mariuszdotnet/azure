@@ -12,7 +12,7 @@
                 "mode": "Incremental",
                 "templateLink": {
                     "uri": "[uri(deployment().properties.templateLink.uri, 'Storage/Create-Automation-Account.json')]",
-                    "contentVersion": "1.0.0.0"
+                    "contentVersion": "1.0.0.1"
                 }
             }
         }
