@@ -4,8 +4,8 @@
 
 $downloadDirectory = "C:\Temp"
 
-$storageAccoutName = "customscriptautomation"
-$storageAccountKey = "/3NvuXZRMWCw6vC0xRGnIVmX/HEim7e9wbbzlGa5lJ3XV4aFvK4cMB8+S87YPOscadeT0SgV52PBB+dHdkmx2g=="
+$storageAccoutName = "autoehdnqnzkdshhq"
+$storageAccountKey = "l3zRRFnmRRuBZuEbbqyU+L5X8Kmv+ZQof+w9X7C3Cmr6Ns+PMwlAF4//+XNzuz/xg2zB7/MPHEnhjhCfBSh+dg=="
 $storageAccountContainer = "sep"
 $packageName = "sep-win-14.0.3752.100.exe"
 
