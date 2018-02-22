@@ -8,10 +8,10 @@ $storageAccoutName = "autoehdnqnzkdshhq"
 $storageAccountKey = "l3zRRFnmRRuBZuEbbqyU+L5X8Kmv+ZQof+w9X7C3Cmr6Ns+PMwlAF4//+XNzuz/xg2zB7/MPHEnhjhCfBSh+dg=="
 $storageAccountContainer = "sep"
 $packageName = "sep-win-14.0.3752.100.exe"
+$installerOptions = '/s'
 
 $installerUri = "https://$storageAccoutName.blob.core.windows.net/$storageAccountContainer/$packageName"
 $installerLocalPath = "$downloadDirectory\$packageName" 
-$installerOptions = '/s'
 
 # create download directory
 if(-not (Test-Path $DownloadDirectory)) {
